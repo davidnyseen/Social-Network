@@ -6,7 +6,7 @@ export default {
     { name: 'Mme.Magloire', group: 1 },
     { name: 'CountessdeLo', group: 1 },
     { name: 'Geborand', group: 1 },
-    { name: 'Champtercier', group: 1 },
+    { name: 'Dav', group: 1 },
     { name: 'Cravatte', group: 1 },
     { name: 'Count', group: 1 },
     { name: 'OldMan', group: 1 },

@@ -12,7 +12,7 @@ interface Props {
 }
 
 interface Refs {
-  mountPoint?: HTMLDivElement;
+  mpoint?: HTMLDivElement;
 }
 
 class App extends Component<Props, {}> {
@@ -29,7 +29,7 @@ class App extends Component<Props, {}> {
       .force('center', d3.forceCenter(width / 2, height / 2));
 
     const svg = d3
-      .select(this.ctrls.mountPoint)
+      .select(this.ctrls.mpoint)
       .append('svg')
       .attr('width', width)
       .attr('height', height);
@@ -43,21 +43,22 @@ class App extends Component<Props, {}> {
       .style('stroke-opacity', 0.6)
       .style('stroke-width', d => Math.sqrt(d.value));
 
-    function dragStarted(d) {
+    function dragStarting(d) {
       !d3.event.active && force.alphaTarget(0.3).restart();
       d.fx = d.x;
       d.fy = d.y;
     }
 
-    function dragged(d) {
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
-    }
+
 
     function dragEnded(d) {
       !d3.event.active && force.alphaTarget(0);
       d.fx = null;
       d.fy = null;
+    }
+    function dragged(d) {
+      d.fx = d3.event.x;
+      d.fy = d3.event.y;
     }
 
     const color = d3.scaleOrdinal(d3.schemeCategory20);
@@ -73,7 +74,7 @@ class App extends Component<Props, {}> {
       .call(
         d3
           .drag()
-          .on('start', dragStarted)
+          .on('start', dragStarting)
           .on('drag', dragged)
           .on('end', dragEnded),
       );
@@ -89,6 +90,7 @@ class App extends Component<Props, {}> {
     });
   }
 
+  
   render() {
     const { width, height } = this.props;
     const style = {
@@ -96,7 +98,7 @@ class App extends Component<Props, {}> {
       height,
       backgroundColor: '#333',
     };
-    return <div style={style} ref={mountPoint => (this.ctrls.mountPoint = mountPoint)} />;
+    return <div style={style} ref={mpoint => (this.ctrls.mpoint = mpoint)} />;
   }
 }
 
