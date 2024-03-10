@@ -8,7 +8,12 @@
     "trailingComma": "all"
   },
   "lint-staged": {
-    "src/**/{*.ts,*.tsx}": ["prettier --write", "npm run production", "git add build/main.js", "git add"]
+    "src/**/{*.ts,*.tsx}": [
+      "prettier --write",
+      "npm run production",
+      "git add build/main.js",
+      "git add"
+    ]
   },
   "main": "src/main.tsx",
   "scripts": {
@@ -16,22 +21,21 @@
     "compile": "webpack",
     "format": "prettier --write \"src/**/{*.ts,*.tsx}\"",
     "start": "webpack-dev-server",
-    "production": "NODE_ENV=production webpack"
   },
   "dependencies": {
     "d3": "^4.12.0",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/d3": "^4.12.0",
-    "@types/react": "^16.0.28",
+    "typescript": "^3.0.0",
+    "@types/react": "^16.8.0",
     "@types/react-dom": "^16.0.3",
     "husky": "^0.14.3",
     "lint-staged": "^6.0.0",
     "prettier": "1.9.1",
     "ts-loader": "^3.2.0",
-    "typescript": "^2.6.2",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.9.7"
   }

@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { Component } from 'react';
+import React, { useEffect } from 'react';
 import * as d3 from 'd3';
 
 interface Props {
@@ -11,95 +10,85 @@ interface Props {
   };
 }
 
-interface Refs {
-  mpoint?: HTMLDivElement;
-}
+function App(props: Props) {
+  useEffect(
+    () => {
+      const { width, height, data } = props;
 
-class App extends Component<Props, {}> {
-  ctrls: Refs = {};
+      const force = d3
+        .forceSimulation()
+        .nodes(data.nodes as any)
+        .force('charge', d3.forceManyBody().strength(-120))
+        .force('link', d3.forceLink(data.links).distance(50))
+        .force('center', d3.forceCenter(width / 2, height / 2));
 
-  componentDidMount() {
-    const { width, height, data } = this.props;
+      const svg = d3.select('.mpoint-svg');
 
-    const force = d3
-      .forceSimulation()
-      .nodes(data.nodes)
-      .force('charge', d3.forceManyBody().strength(-120))
-      .force('link', d3.forceLink(data.links).distance(50))
-      .force('center', d3.forceCenter(width / 2, height / 2));
+      const link = svg
+        .selectAll('line')
+        .data(data.links)
+        .enter()
+        .append('line')
+        .style('stroke', '#999999')
+        .style('stroke-opacity', 0.6)
+        .style('stroke-width', d => Math.sqrt(d.value));
 
-    const svg = d3
-      .select(this.ctrls.mpoint)
-      .append('svg')
-      .attr('width', width)
-      .attr('height', height);
+      function dragStarting(d) {
+        !d3.event.active && force.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      }
 
-    const link = svg
-      .selectAll('line')
-      .data(data.links)
-      .enter()
-      .append('line')
-      .style('stroke', '#999999')
-      .style('stroke-opacity', 0.6)
-      .style('stroke-width', d => Math.sqrt(d.value));
+      function dragFinish(d) {
+        !d3.event.active && force.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      }
 
-    function dragStarting(d) {
-      !d3.event.active && force.alphaTarget(0.3).restart();
-      d.fx = d.x;
-      d.fy = d.y;
-    }
+      function dragged(d) {
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+      }
 
+      const color = d3.scaleOrdinal(d3.schemeCategory20);
+      const node = svg
+        .selectAll('circle')
+        .data(data.nodes)
+        .enter()
+        .append<SVGCircleElement>('circle')
+        .attr('r', 5)
+        .style('stroke', '#FFFFFF')
+        .style('stroke-width', 1.5)
+        .style('fill', (d: any) => color(d.group))
+        .call(
+          d3
+            .drag()
+            .on('start', dragStarting)
+            .on('drag', dragged)
+            .on('end', dragFinish),
+        );
 
+      force.on('tick', () => {
+        link
+          .attr('x1', (d: any) => d.source.x)
+          .attr('y1', (d: any) => d.source.y)
+          .attr('x2', (d: any) => d.target.x)
+          .attr('y2', (d: any) => d.target.y);
 
-    function dragEnded(d) {
-      !d3.event.active && force.alphaTarget(0);
-      d.fx = null;
-      d.fy = null;
-    }
-    function dragged(d) {
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
-    }
+        node.attr('cx', (d: any) => d.x).attr('cy', (d: any) => d.y);
+      });
+    },
+    [props],
+  );
 
-    const color = d3.scaleOrdinal(d3.schemeCategory20);
-    const node = svg
-      .selectAll('circle')
-      .data(data.nodes)
-      .enter()
-      .append<SVGCircleElement>('circle')
-      .attr('r', 5)
-      .style('stroke', '#FFFFFF')
-      .style('stroke-width', 1.5)
-      .style('fill', (d: any) => color(d.group))
-      .call(
-        d3
-          .drag()
-          .on('start', dragStarting)
-          .on('drag', dragged)
-          .on('end', dragEnded),
-      );
+  const { width, height } = props;
+  const style = {
+    width,
+    height,
+    backgroundColor: '#333',
+  };
 
-    force.on('tick', () => {
-      link
-        .attr('x1', (d: any) => d.source.x)
-        .attr('y1', (d: any) => d.source.y)
-        .attr('x2', (d: any) => d.target.x)
-        .attr('y2', (d: any) => d.target.y);
-
-      node.attr('cx', (d: any) => d.x).attr('cy', (d: any) => d.y);
-    });
-  }
-
-  
-  render() {
-    const { width, height } = this.props;
-    const style = {
-      width,
-      height,
-      backgroundColor: '#333',
-    };
-    return <div style={style} ref={mpoint => (this.ctrls.mpoint = mpoint)} />;
-  }
+  return <div className="mpoint-svg" style={style} />;
 }
 
 export default App;
